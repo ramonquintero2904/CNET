@@ -51,6 +51,39 @@
     </script>
 
     <script>navigator.serviceWorker.register('service-worker.js', { updateViaCache: 'none' });</script>
+
+    <script>
+        window.BlazorCamera = {
+            start: async (videoId) => {
+                try {
+                    const video = document.getElementById(videoId);
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: "environment" }, // Prioriza la cámara trasera en móviles
+                        audio: false
+                    });
+                    video.srcObject = stream;
+                    video.play();
+                    return true;
+                } catch (err) {
+                    console.error("Error accediendo a la cámara: ", err);
+                    return false;
+                }
+            },
+            capture: (videoId, canvasId) => {
+                const video = document.getElementById(videoId);
+                const canvas = document.getElementById(canvasId);
+                const context = canvas.getContext('2d');
+
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // Retorna la imagen en formato Base64 comprimida como JPEG
+                return canvas.toDataURL('image/jpeg', 0.85);
+            }
+        };
+    </script>
+
 </body>
 
 </html>
